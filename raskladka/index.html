@@ -647,7 +647,8 @@
         '<div><b>' + fmt(last.cutN) + '</b><span>с подрезкой</span></div>' +
         '<div><b>' + fmt(Math.ceil(last.total / P.perPallet)) + '</b><span>поддонов</span></div>' +
       '</div>' +
-      (rows ? '<table class="rkdoc__tbl"><thead><tr><th>Размер обрезка</th><th class="ta-r">Штук</th>' +
+      (rows ? '<table class="rkdoc__tbl"><caption class="visually-hidden">Ведомость подрезки</caption>' +
+        '<thead><tr><th>Габарит обрезка</th><th class="ta-r">Штук</th>' +
         '<th class="ta-r">Доля камня</th><th>Тип реза</th></tr></thead><tbody>' + rows + '</tbody></table>' : '') +
       '<div class="rkdoc__foot">' +
         '<p><b>Что это за лист.</b> Раскладка построена из типоразмера Б1.П6 200\u00D7100\u00D760 мм ' +
