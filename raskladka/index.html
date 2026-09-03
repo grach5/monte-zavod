@@ -662,6 +662,36 @@
     window.print();
   });
 
-  decode(); syncUI(); render();
+  /* ---------- миниатюры раскладок ---------- */
+  function thumbs() {
+    var was = state.bond;
+    root.querySelectorAll('[data-fig]').forEach(function (el) {
+      var id = el.dataset.fig;
+      var c = document.createElement('canvas');
+      c.width = 180; c.height = 120;
+      var g = c.getContext('2d');
+      g.fillStyle = '#E6E8EA'; g.fillRect(0, 0, 180, 120);
+      state.bond = id;
+      var L = 34, S = 17, J = 2, cells = [];
+      var rot = id === 'herring45' ? Math.PI / 4 : 0;
+      genPattern(cells, -120, 300, -120, 240, L, S, J);
+      g.save();
+      g.translate(90, 60); g.rotate(rot); g.translate(-90, -60);
+      for (var i = 0; i < cells.length; i++) {
+        var r = cells[i];
+        g.fillStyle = (id === 'checker' && r.c % 2) ? '#7E858B' : '#B9BEC3';
+        g.fillRect(r.x, r.y, r.w, r.h);
+        g.strokeStyle = 'rgba(0,0,0,.30)'; g.lineWidth = 0.8;
+        g.strokeRect(r.x, r.y, r.w, r.h);
+      }
+      g.restore();
+      el.style.backgroundImage = 'url(' + c.toDataURL('image/png') + ')';
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = 'center';
+    });
+    state.bond = was;
+  }
+
+  decode(); syncUI(); thumbs(); render();
 })();
 </script>
