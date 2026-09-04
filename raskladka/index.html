@@ -494,8 +494,13 @@
     var names = state.slugs.map(function (sl) {
       var c = COLORS.find(function (x) { return x.slug === sl; }); return c ? c.name : sl;
     }).join(' + ');
+    if (res.total === 0) {
+      $('cap').textContent = 'Мостить нечего: вырезы занимают весь участок. Уменьшите их размер или количество.';
+      $('cuts').hidden = true;
+      return;
+    }
     $('cap').textContent = NAME[state.bond] + ' \u00B7 ' + names + ' \u00B7 шов ' + state.joint +
-      ' мм \u00B7 участок ' + fmt(res.areaM2, 1) + ' м\u00B2 \u00B7 запас ' + fmt(res.wastePc, 1) + ' %';
+      ' мм \u00B7 участок ' + fmt(res.siteM2, 1) + ' м\u00B2 \u00B7 запас ' + fmt(res.wastePc, 1) + ' %';
 
     var box = $('cuts'), rows = $('cuts-rows');
     if (res.cuts.length) {
