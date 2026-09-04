@@ -10,7 +10,12 @@
   <url><loc>https://grach5.github.io/monte-zavod/production/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://grach5.github.io/monte-zavod/catalog/plitka/tsveta/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://grach5.github.io/monte-zavod/catalog/pod-zakaz/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://grach5.github.io/monte-zavod/calculator/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/asfalt/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/marka-smesi/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/emulsiya/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/osnovanie/</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://grach5.github.io/monte-zavod/calculator/zemlyanye-raboty/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://grach5.github.io/monte-zavod/raskladka/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://grach5.github.io/monte-zavod/podbor/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://grach5.github.io/monte-zavod/spravochnik/</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
