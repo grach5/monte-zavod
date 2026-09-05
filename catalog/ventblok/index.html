@@ -153,4 +153,39 @@
     }, { threshold: 0.5 });
     document.querySelectorAll('[data-count]').forEach(function (el) { co.observe(el); });
   })();
-</script>  </body> </html>
+</script>   <!--
+  Цели считаются на всех страницах разом, а не в каждом калькуляторе:
+  так их не забудут добавить в новый расчёт. Без счётчика функция goal
+  просто ничего не делает.
+--> <script>(function(){const ymId = null;
+const G = {"request":"zayavka_otpravlena","calc":"raschet_ispolzovan","phone":"klik_po_telefonu","offer":"zapros_iz_predlozheniya"};
+
+  (function () {
+    const goal = (name) => {
+      if (!ymId || typeof window.ym !== 'function') return;
+      window.ym(ymId, 'reachGoal', name);
+    };
+    window.monteGoal = goal;
+
+    // Звонок с сайта — такая же заявка, только голосом.
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a');
+      if (!a) return;
+      if (a.getAttribute('href')?.startsWith('tel:')) goal(G.phone);
+      if (a.closest('.offer__acts') && a.classList.contains('btn--primary')) goal(G.offer);
+    });
+
+    // Расчёт засчитывается один раз за визит на страницу: иначе каждая
+    // нажатая клавиша в поле превратилась бы в отдельное достижение цели.
+    const calc = document.querySelector('[data-rc], [data-pc], [data-calc], [data-rk]');
+    if (calc) {
+      let sent = false;
+      const once = () => { if (!sent) { sent = true; goal(G.calc); } };
+      calc.addEventListener('input', once, { passive: true });
+      calc.addEventListener('change', once, { passive: true });
+      calc.addEventListener('click', (e) => {
+        if (e.target.closest('button, .chip-btn, .rk__shape')) once();
+      }, { passive: true });
+    }
+  })();
+})();</script> </body> </html>
