@@ -1,0 +1,1 @@
+const e="monte-spec-v1";function a(c){let t=[];try{t=JSON.parse(localStorage.getItem(e)||"[]")||[]}catch{t=[]}t.push(c);try{localStorage.setItem(e,JSON.stringify(t))}catch{}try{document.dispatchEvent(new CustomEvent("monte-spec-change"))}catch{}}export{a};
