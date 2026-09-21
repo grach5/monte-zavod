@@ -380,16 +380,18 @@
 </p> <div class="hero__cta" data-astro-cid-j7pv25f6> <a href="/monte-zavod/catalog/" class="btn btn--primary btn--lg" data-astro-cid-j7pv25f6>Каталог</a> <a href="/monte-zavod/price/" class="btn btn--ghost btn--lg" data-astro-cid-j7pv25f6>Прайс</a> </div> <a class="hero__award" href="/monte-zavod/documents/#award" data-astro-cid-j7pv25f6> <img src="/monte-zavod/img/awards/best-primorye-2026.png" alt="" width="560" height="560" loading="lazy" decoding="async" data-astro-cid-j7pv25f6> <span data-astro-cid-j7pv25f6><b data-astro-cid-j7pv25f6>Лучший товар Приморья 2026 года</b> <span data-astro-cid-j7pv25f6>· бордюр, стеновой камень и плитка — письмо ФБУ «Дальневосточный ЦСМ», Росстандарт</span></span> </a> </div> <figure class="photo photo--hero" data-hero-video data-astro-cid-j7pv25f6> <div class="photo__stage" data-astro-cid-j7pv25f6> <video class="photo__video" muted loop playsinline controls preload="none" poster="/monte-zavod/img/video/hero-poster.webp" width="1280" height="720" aria-label="Линия вибропрессования: формовка и укладка бетонных изделий, видео без звука" data-hero-v data-astro-cid-j7pv25f6> <source src="/monte-zavod/video/hero.mp4" type="video/mp4" data-astro-cid-j7pv25f6> </video> <button type="button" class="btn photo__play" data-hero-play hidden data-astro-cid-j7pv25f6>Смотреть</button> </div> <figcaption class="mono-label" data-astro-cid-j7pv25f6>Линия вибропрессования — видео производителя оборудования, не съёмка завода МОНТЕ</figcaption> </figure> </div> </section> <script>
   // В разметке автоплея нет и preload="none": иначе браузер начинает тянуть
   // mp4 ещё на парсинге, до любого скрипта. Режим решает скрипт: обычный —
-  // ставит autoplay и play(); при prefers-reduced-motion, экономии трафика
-  // или slow-2g/2g/3g — ничего не грузит, стоит постер и кнопка «Смотреть»,
-  // по клику ролик идёт с родными controls. Без JS — постер + controls.
+  // ставит autoplay и play(); при prefers-reduced-motion или явном saveData —
+  // ничего не грузит, стоит постер и кнопка «Смотреть», по клику ролик идёт
+  // с родными controls. Без JS — постер + controls. Эвристики по
+  // effectiveType нет: Chrome отдаёт «3g» и на обычной сети, у заказчика
+  // видео из-за этого не запускалось. Если play() отклонён браузером —
+  // та же кнопка «Смотреть», что и в still.
   // Зовётся на astro:page-load (и сразу, если DOM уже готов); повтор гасит data-ready.
   (function () {
-    var SLOW = ['slow-2g', '2g', '3g'];
     function still() {
       var m = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var c = navigator.connection || {};
-      return !!(m || c.saveData || SLOW.indexOf(c.effectiveType) !== -1);
+      return !!(m || c.saveData === true);
     }
     function init() {
       document.querySelectorAll('[data-hero-video]').forEach(function (fig) {
@@ -399,14 +401,12 @@
         if (!v || !btn) return;
         fig.dataset.ready = '1';
         v.controls = false;
+        function showButton() { fig.dataset.still = '1'; btn.hidden = false; }
         if (!still()) {
           v.muted = true; v.autoplay = true; v.setAttribute('autoplay', '');
           var pr = v.play();
-          if (pr && pr.catch) pr.catch(function () { v.controls = true; });
-          return;
-        }
-        fig.dataset.still = '1';
-        btn.hidden = false;
+          if (pr && pr.catch) pr.catch(function () { v.removeAttribute('autoplay'); v.autoplay = false; showButton(); });
+        } else showButton();
         btn.addEventListener('click', function () {
           delete fig.dataset.still;
           btn.hidden = true;
