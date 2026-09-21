@@ -383,9 +383,13 @@
   // ставит autoplay и play(); при prefers-reduced-motion или явном saveData —
   // ничего не грузит, стоит постер и кнопка «Смотреть», по клику ролик идёт
   // с родными controls. Без JS — постер + controls. Эвристики по
-  // effectiveType нет: Chrome отдаёт «3g» и на обычной сети, у заказчика
-  // видео из-за этого не запускалось. Если play() отклонён браузером —
-  // та же кнопка «Смотреть», что и в still.
+  // effectiveType нет: Chrome отдаёт «3g» и на обычной сети.
+  // Отказ play() — не приговор: Chrome отклоняет его AbortError'ом, если
+  // вкладка была фоновой в момент вызова («video-only background media was
+  // paused to save power») — так и вышло у заказчика. Поэтому повторяем на
+  // visibilitychange, при появлении видео в зоне видимости (порог 0,25) и один
+  // раз через 1 с; кнопка «Смотреть» — только при NotAllowedError после
+  // повторной попытки или если после всех попыток видео стоит при видимой вкладке.
   // Зовётся на astro:page-load (и сразу, если DOM уже готов); повтор гасит data-ready.
   (function () {
     function still() {
@@ -401,15 +405,44 @@
         if (!v || !btn) return;
         fig.dataset.ready = '1';
         v.controls = false;
+        var done = false, denied = 0, io = null;
         function showButton() { fig.dataset.still = '1'; btn.hidden = false; }
-        if (!still()) {
-          v.muted = true; v.autoplay = true; v.setAttribute('autoplay', '');
+        function hideButton() { delete fig.dataset.still; btn.hidden = true; }
+        function stop() {
+          if (done) return; done = true;
+          document.removeEventListener('visibilitychange', onVisible);
+          if (io) io.disconnect();
+        }
+        function tryPlay() {
+          if (done || !v.paused) return;
           var pr = v.play();
-          if (pr && pr.catch) pr.catch(function () { v.removeAttribute('autoplay'); v.autoplay = false; showButton(); });
-        } else showButton();
+          if (!pr || !pr.then) return;
+          pr.then(function () { hideButton(); stop(); }, function (e) {
+            if (e && e.name === 'NotAllowedError' && ++denied >= 2) { v.autoplay = false; v.removeAttribute('autoplay'); showButton(); stop(); }
+          });
+        }
+        function onVisible() { if (document.visibilityState === 'visible') tryPlay(); }
+        v.addEventListener('playing', function () { hideButton(); stop(); });
+        if (still()) { showButton(); }
+        else {
+          v.muted = true; v.autoplay = true; v.setAttribute('autoplay', '');
+          tryPlay();
+          document.addEventListener('visibilitychange', onVisible);
+          if ('IntersectionObserver' in window) {
+            io = new IntersectionObserver(function (es) {
+              if (es.some(function (x) { return x.isIntersecting; })) tryPlay();
+            }, { threshold: 0.25 });
+            io.observe(v);
+          }
+          setTimeout(function () {
+            tryPlay();
+            setTimeout(function () {
+              if (!done && v.paused && document.visibilityState === 'visible') showButton();
+            }, 400);
+          }, 1000);
+        }
         btn.addEventListener('click', function () {
-          delete fig.dataset.still;
-          btn.hidden = true;
+          hideButton(); stop();
           v.controls = true;
           var p2 = v.play();
           if (p2 && p2.catch) p2.catch(function () {});
